@@ -49,5 +49,29 @@ async function getRecipesPreview(recipeIds) {
   }
 }
 
+async function getRandomRecipes() {
+  const response = await axios.get(`${api_domain}/random`, {
+    params: {
+      number: 3,
+      apiKey: process.env.spooncular_apiKey,
+    },
+  });
+  // Extract specific details from the response
+  const recipes = response.data.recipes.map((recipe) => {
+    return {
+      id: recipe.id,
+      title: recipe.title,
+      readyInMinutes: recipe.readyInMinutes,
+      image: recipe.image,
+      popularity: recipe.aggregateLikes,
+      vegan: recipe.vegan,
+      vegetarian: recipe.vegetarian,
+      glutenFree: recipe.glutenFree,
+    };
+  });
+  return recipes;
+}
+
 exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
+exports.getRandomRecipes = getRandomRecipes;

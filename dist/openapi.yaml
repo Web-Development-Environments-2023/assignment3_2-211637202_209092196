@@ -174,6 +174,23 @@ paths:
                 $ref: '#/components/schemas/RecipePreview'
         '404':
           description: recipeId is not exists
+  /recipes/random:
+    get:
+      tags:
+        - Recipes
+      summary: Return 3 random recipes from the external api
+      description: Return an array of length 3 that has 3 random recipes from the external api
+      responses:
+        '200':
+          description: 3 random recipes are successfully accepted by the external api
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        '500':
+          description: unexpected error
 components:
   schemas:
     User:
