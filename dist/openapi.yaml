@@ -150,6 +150,70 @@ paths:
           description: user is not authorized
       security:
         - cookieAuth: []
+  /users/create:
+    post:
+      tags:
+        - Users
+      summary: create a recipe by a user
+      description: giving all recipe informations needed, the user create a recipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRecipe'
+        required: true
+      responses:
+        '200':
+          description: Recipe created successfully by the user
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/myrecipes:
+    get:
+      tags:
+        - Users
+      summary: return preview details for all recipes the user created
+      description: return an array with all preview details of the user's recipes
+      responses:
+        '200':
+          description: the user's recipes data is successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRecipePreview'
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/myrecipes/allInformations/{title}:
+    get:
+      tags:
+        - Users
+      summary: Return all details of a user created recipe
+      description: Return all details of a user created recipe
+      parameters:
+        - name: title
+          in: path
+          description: recipe title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: recipe details returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRecipe'
+        '204':
+          description: recipe's title is not found in the user own recipes
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
   /recipes/{recipeId}:
     get:
       tags:
@@ -231,7 +295,7 @@ paths:
         - name: number
           in: path
           description: number of recipes to return
-          required: false
+          required: true
           schema:
             type: integer
         - name: cuisine
@@ -519,3 +583,79 @@ components:
                   ],
               },
             ]
+    UserRecipe:
+      type: object
+      properties:
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: string
+          description: list of the recipe ingredients
+          example: one tablespoon of backing powder and one cup of milk
+        analyzedInstructions:
+          type: string
+          description: making instruction
+          example: mix the milk with the backing powder
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
+    UserRecipePreview:
+      type: object
+      properties:
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false

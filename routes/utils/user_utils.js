@@ -22,7 +22,28 @@ async function getVisitedRecipes(user_id) {
   return recipes_id;
 }
 
+async function createRecipes(dic) {
+  await DButils.execQuery(
+    `INSERT INTO Recipes (user_id, title, image, readyInMinutes, popularity, vegetarian, vegan, glutenFree, extendedIngredients, analyzedInstructions, servings) VALUES ('${dic.user_id}', '${dic.title}', '${dic.image}', '${dic.readyInMinutes}', '${dic.popularity}', '${dic.vegetarian}', '${dic.vegan}', '${dic.glutenFree}', '${dic.extendedIngredients}', '${dic.analyzedInstructions}', '${dic.servings}')`
+  );
+}
+
+async function getMyRecipes(user_id) {
+  const recipes = await DButils.execQuery(
+    `SELECT title, image, readyInMinutes, popularity, vegetarian, vegan, glutenFree FROM Recipes WHERE user_id = '${user_id}'`
+  );
+  return recipes;
+}
+
+async function getMyRecipesDetailed(user_id, title) {
+  const recipe = await DButils.execQuery(`SELECT * FROM Recipes WHERE user_id = '${user_id}' AND title = '${title}'`);
+  return recipe;
+}
+
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.markAsVisited = markAsVisited;
 exports.getVisitedRecipes = getVisitedRecipes;
+exports.createRecipes = createRecipes;
+exports.getMyRecipes = getMyRecipes;
+exports.getMyRecipesDetailed = getMyRecipesDetailed;

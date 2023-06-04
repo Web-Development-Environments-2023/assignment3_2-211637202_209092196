@@ -83,4 +83,65 @@ router.get('/visited', async (req, res, next) => {
   }
 });
 
+router.post('/create', async (req, res, next) => {
+  try {
+    const {
+      title,
+      image,
+      readyInMinutes,
+      popularity,
+      vegetarian,
+      vegan,
+      glutenFree,
+      extendedIngredients,
+      analyzedInstructions,
+      servings,
+    } = req.body;
+
+    const recipe = {
+      user_id: req.session.user_id,
+      title,
+      image,
+      readyInMinutes,
+      popularity,
+      vegetarian,
+      vegan,
+      glutenFree,
+      extendedIngredients,
+      analyzedInstructions,
+      servings,
+    };
+
+    await user_utils.createRecipes(recipe);
+    res.status(200).send('Recipe created successfully!');
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/myrecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes = await user_utils.getMyRecipes(user_id);
+    res.status(200).send(recipes);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/myrecipes/allInformations/:title', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const title = req.params.title;
+    const recipes = await user_utils.getMyRecipesDetailed(user_id, title);
+    if (recipes.length === 0) {
+      res.status(204).send('no recipes found');
+    } else {
+      res.status(200).send(recipes);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
