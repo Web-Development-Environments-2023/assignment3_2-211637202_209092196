@@ -98,9 +98,9 @@ paths:
             schema:
               type: object
               properties:
-                reciepeId:
+                recipeId:
                   type: string
-                  description: reciepe's id which the user saved
+                  description: recipe's id which the user saved
                   example: 716429
       responses:
         '200':
@@ -191,6 +191,84 @@ paths:
                   $ref: '#/components/schemas/RecipePreview'
         '500':
           description: unexpected error
+  /recipes/allInformations/{recipeId}:
+    get:
+      tags:
+        - Recipes
+      summary: Return all preview details on recipe by his ID
+      description: Return all preview details on recipe by his ID
+      parameters:
+        - name: recipeId
+          in: path
+          description: recipe's id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: data about the recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreviewAll'
+        '404':
+          description: recipeId is not exists
+  /recipes/search/{query}/{number}:
+    get:
+      tags:
+        - Recipes
+      summary: search for recipes by using a query
+      description: search for recipes by using a query
+      parameters:
+        - name: query
+          in: path
+          description: query used for searching the recipe
+          required: true
+          schema:
+            type: string
+        - name: number
+          in: path
+          description: number of recipes to return
+          required: false
+          schema:
+            type: integer
+        - name: cuisine
+          in: query
+          description: filtering by cuisine
+          explode: false
+          schema:
+            type: string
+        - name: diet
+          in: query
+          description: filtering by diet
+          explode: false
+          schema:
+            type: string
+        - name: intolerances
+          in: query
+          description: filtering by intolerances
+          explode: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: The strategy to sort recipes by
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data about the recipes is successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchPreview'
+        '204':
+          description: no recipes found for this query
 components:
   schemas:
     User:
@@ -285,3 +363,159 @@ components:
           type: boolean
           description: indication if the recipe is gluten free
           example: false
+    RecipePreviewAll:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: recipe identifier
+          example: 102
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: object
+          description: list of the recipe ingredients
+          example:
+            [
+              {
+                'id': 11124,
+                'aisle': 'Produce',
+                'image': 'sliced-carrot.png',
+                'consistency': 'SOLID',
+                'name': 'carrot',
+                'nameClean': 'carrot',
+                'original': 'Â½ cup diced carrot',
+                'originalName': 'diced carrot',
+                'amount': 0.5,
+                'unit': 'cup',
+                'meta': ['diced'],
+                'measures':
+                  {
+                    'us': { 'amount': 0.5, 'unitShort': 'cups', 'unitLong': 'cups' },
+                    'metric': { 'amount': 118.294, 'unitShort': 'ml', 'unitLong': 'milliliters' },
+                  },
+              },
+            ]
+        analyzedInstructions:
+          type: object
+          description: making instruction
+          example:
+            [
+              {
+                'name': '',
+                'steps':
+                  [
+                    {
+                      'number': 1,
+                      'step': 'Deep fry shallot till golden brown, drain oil and set aside.  Retain the oil for later use.Wash rice and add oil.',
+                      'ingredients':
+                        [
+                          { 'id': 11677, 'name': 'shallot', 'localizedName': 'shallot', 'image': 'shallots.jpg' },
+                          { 'id': 20444, 'name': 'rice', 'localizedName': 'rice', 'image': 'uncooked-white-rice.png' },
+                          {
+                            'id': 4582,
+                            'name': 'cooking oil',
+                            'localizedName': 'cooking oil',
+                            'image': 'vegetable-oil.jpg',
+                          },
+                        ],
+                      'equipment': [],
+                    },
+                  ],
+              },
+            ]
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
+    SearchPreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: recipe identifier
+          example: 102
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        analyzedInstructions:
+          type: object
+          description: making instruction
+          example:
+            [
+              {
+                'name': '',
+                'steps':
+                  [
+                    {
+                      'number': 1,
+                      'step': 'Deep fry shallot till golden brown, drain oil and set aside.  Retain the oil for later use.Wash rice and add oil.',
+                      'ingredients':
+                        [
+                          { 'id': 11677, 'name': 'shallot', 'localizedName': 'shallot', 'image': 'shallots.jpg' },
+                          { 'id': 20444, 'name': 'rice', 'localizedName': 'rice', 'image': 'uncooked-white-rice.png' },
+                          {
+                            'id': 4582,
+                            'name': 'cooking oil',
+                            'localizedName': 'cooking oil',
+                            'image': 'vegetable-oil.jpg',
+                          },
+                        ],
+                      'equipment': [],
+                    },
+                  ],
+              },
+            ]

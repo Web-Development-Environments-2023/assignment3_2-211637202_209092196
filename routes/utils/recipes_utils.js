@@ -33,6 +33,75 @@ async function getRecipeDetails(recipe_id) {
   };
 }
 
+// return the recipe informations (with ingredients and process ...)
+async function getAllInformations(recipe_id) {
+  let recipe_info = await getRecipeInformation(recipe_id);
+  let {
+    id,
+    title,
+    readyInMinutes,
+    image,
+    aggregateLikes,
+    vegan,
+    vegetarian,
+    glutenFree,
+    extendedIngredients,
+    analyzedInstructions,
+    servings,
+  } = recipe_info.data;
+
+  return {
+    id: id,
+    title: title,
+    readyInMinutes: readyInMinutes,
+    image: image,
+    popularity: aggregateLikes,
+    vegan: vegan,
+    vegetarian: vegetarian,
+    glutenFree: glutenFree,
+    extendedIngredients: extendedIngredients,
+    analyzedInstructions: analyzedInstructions,
+    servings: servings,
+  };
+}
+
+async function searchRecipes(query, number, cuisine, diet, intolerance, sort) {
+  const response = await axios.get(`${api_domain}/complexSearch`, {
+    params: {
+      query: query,
+      number: number,
+      cuisine: cuisine,
+      diet: diet,
+      intolerances: intolerance,
+      sort: sort,
+      apiKey: process.env.spooncular_apiKey,
+    },
+  });
+
+  const recipeIds = response.data.results.map((recipe) => recipe.id);
+  const searchResults = await Promise.all(recipeIds.map(getRecipeDetailsForSeach));
+
+  return searchResults;
+}
+
+async function getRecipeDetailsForSeach(recipe_id) {
+  let recipe_info = await getRecipeInformation(recipe_id);
+  let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, analyzedInstructions } =
+    recipe_info.data;
+
+  return {
+    id: id,
+    title: title,
+    readyInMinutes: readyInMinutes,
+    image: image,
+    popularity: aggregateLikes,
+    vegan: vegan,
+    vegetarian: vegetarian,
+    glutenFree: glutenFree,
+    analyzedInstructions: analyzedInstructions,
+  };
+}
+
 // return all information of the recipes in recipeIDs array
 async function getRecipesPreview(recipeIds) {
   try {
@@ -75,3 +144,5 @@ async function getRandomRecipes() {
 exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomRecipes = getRandomRecipes;
+exports.getAllInformations = getAllInformations;
+exports.searchRecipes = searchRecipes;
