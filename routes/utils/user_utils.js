@@ -36,7 +36,24 @@ async function getMyRecipes(user_id) {
 }
 
 async function getMyRecipesDetailed(user_id, title) {
-  const recipe = await DButils.execQuery(`SELECT * FROM Recipes WHERE user_id = '${user_id}' AND title = '${title}'`);
+  const recipe =
+    await DButils.execQuery(`SELECT title, image, readyInMinutes, popularity, vegetarian, vegan, glutenFree,
+  extendedIngredients, analyzedInstructions, servings FROM Recipes WHERE user_id = '${user_id}' AND title = '${title}'`);
+  return recipe;
+}
+
+async function getFamilyRecipes(user_id) {
+  const recipes = await DButils.execQuery(
+    `SELECT title, image, readyInMinutes, popularity, vegetarian, vegan, glutenFree FROM FamilyRecipes WHERE user_id = '${user_id}'`
+  );
+  return recipes;
+}
+
+async function getFamilyRecipesDetailed(user_id, title) {
+  const recipe = await DButils.execQuery(
+    `SELECT belongTo, whenToMake, title, image, readyInMinutes, popularity, vegetarian, vegan, glutenFree,
+    extendedIngredients, analyzedInstructions, servings FROM FamilyRecipes WHERE user_id = '${user_id}' AND title = '${title}'`
+  );
   return recipe;
 }
 
@@ -47,3 +64,5 @@ exports.getVisitedRecipes = getVisitedRecipes;
 exports.createRecipes = createRecipes;
 exports.getMyRecipes = getMyRecipes;
 exports.getMyRecipesDetailed = getMyRecipesDetailed;
+exports.getFamilyRecipes = getFamilyRecipes;
+exports.getFamilyRecipesDetailed = getFamilyRecipesDetailed;

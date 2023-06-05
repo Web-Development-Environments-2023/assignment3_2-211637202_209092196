@@ -144,4 +144,29 @@ router.get('/myrecipes/allInformations/:title', async (req, res, next) => {
   }
 });
 
+router.get('/familyrecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes = await user_utils.getFamilyRecipes(user_id);
+    res.status(200).send(recipes);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/familyrecipes/allInformations/:title', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const title = req.params.title;
+    const recipes = await user_utils.getFamilyRecipesDetailed(user_id, title);
+    if (recipes.length === 0) {
+      res.status(204).send('no recipes found');
+    } else {
+      res.status(200).send(recipes);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

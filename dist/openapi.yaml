@@ -214,6 +214,51 @@ paths:
           description: user is not authorized
       security:
         - cookieAuth: []
+  /users/familyrecipes:
+    get:
+      tags:
+        - Users
+      summary: return family recipes preview
+      description: return an array of the family recipes that were saved by the user
+      responses:
+        '200':
+          description: family recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRecipePreview'
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/familyrecipes/allInformations/{title}:
+    get:
+      tags:
+        - Users
+      summary: Return all details of a user family recipe
+      description: Return all details of a user family recipe
+      parameters:
+        - name: title
+          in: path
+          description: recipe title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: recipes details returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyRecipesDetailed'
+        '204':
+          description: recipe's title is not found in the user own recipes
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
   /recipes/{recipeId}:
     get:
       tags:
@@ -659,3 +704,55 @@ components:
           type: boolean
           description: indication if the recipe is gluten free
           example: false
+    FamilyRecipesDetailed:
+      type: object
+      properties:
+        belongTo:
+          type: string
+          description: who made this recipe
+          example: grandmother
+        whenToMake:
+          type: string
+          description: when to make this recipe
+          example: easter
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: string
+          description: list of the recipe ingredients
+          example: one tablespoon of backing powder and one cup of milk
+        analyzedInstructions:
+          type: string
+          description: making instruction
+          example: mix the milk with the backing powder
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
