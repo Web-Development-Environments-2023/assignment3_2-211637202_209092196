@@ -29,6 +29,10 @@ router.post('/favorites', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
+
+    // Check if the recipe ID is valid
+    const recipeDetails = await recipe_utils.getRecipeDetails(recipe_id);
+
     await user_utils.markAsFavorite(user_id, recipe_id);
     res.status(200).send('The Recipe successfully saved as favorite');
   } catch (error) {
@@ -59,6 +63,10 @@ router.post('/visited', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
+
+    // Check if the recipe ID is valid
+    const recipeDetails = await recipe_utils.getRecipeDetails(recipe_id);
+
     await user_utils.markAsVisited(user_id, recipe_id);
     res.status(200).send('The Recipe successfully saved as visited');
   } catch (error) {

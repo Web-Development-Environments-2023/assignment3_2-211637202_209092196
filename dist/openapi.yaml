@@ -107,6 +107,8 @@ paths:
           description: The Recipe successfully saved as favorite
         '401':
           description: user is not authorized
+        '500':
+          description: spoonacular could not find a recipe with the id provided
       security:
         - cookieAuth: []
   /users/visited:
@@ -148,6 +150,8 @@ paths:
           description: The recipe has been successfully added to the user viewed recipes list
         '401':
           description: user is not authorized
+        '500':
+          description: spoonacular could not find a recipe with the id provided
       security:
         - cookieAuth: []
   /users/create:
