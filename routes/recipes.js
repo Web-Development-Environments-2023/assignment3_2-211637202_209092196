@@ -30,6 +30,7 @@ router.get('/search/:query/:number', async (req, res, next) => {
     let { number } = req.params;
     const { cuisine, diet, intolerances, sort } = req.query;
 
+    ////////////////////////////////
     if (number === '{number}') {
       number = 5;
     }
@@ -51,6 +52,15 @@ router.get('/search/:query/:number', async (req, res, next) => {
       // Return the search results as the response
       res.status(200).send(searchResults);
     }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/getInstructions/:recipeId', async (req, res, next) => {
+  try {
+    const instructions = await recipes_utils.getInstructions(req.params.recipeId);
+    res.send(instructions);
   } catch (error) {
     next(error);
   }

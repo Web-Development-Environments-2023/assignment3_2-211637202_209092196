@@ -141,8 +141,30 @@ async function getRandomRecipes() {
   return recipes;
 }
 
+async function getInstructions(recipe_id) {
+  const response = await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
+    params: {
+      stepBreakdown: true,
+      apiKey: process.env.spooncular_apiKey,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error('Failed to retrieve analyzed instructions');
+  }
+
+  const instructions = response.data;
+
+  if (instructions.length === 0) {
+    throw new Error('No instructions found for the provided recipe ID');
+  }
+
+  return instructions[0].steps;
+}
+
 exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomRecipes = getRandomRecipes;
 exports.getAllInformations = getAllInformations;
 exports.searchRecipes = searchRecipes;
+exports.getInstructions = getInstructions;

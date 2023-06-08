@@ -263,6 +263,69 @@ paths:
           description: user is not authorized
       security:
         - cookieAuth: []
+  /users/meal:
+    get:
+      tags:
+        - Users
+      summary: Return the meals id saved for the user
+      description: Get an array of recipes_id saved in the user's meal
+      responses:
+        '200':
+          description: data about the user's reciped_id returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    recipeId:
+                      type: string
+                      description: recipe's id which the user saved
+                      example: 716429
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+    post:
+      tags:
+        - Users
+      summary: save recipe in the meal list of a user
+      description: save recipe in the meal list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        '200':
+          description: The Recipe successfully saved in meal list
+        '401':
+          description: user is not authorized
+    delete:
+      tags:
+        - Users
+      summary: Remove a recipe from the meal list of a user
+      description: Remove a recipe from the meal list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        '200':
+          description: The recipe was successfully removed from the meal list
+        '401':
+          description: User is not authorized
   /recipes/{recipeId}:
     get:
       tags:
@@ -382,6 +445,32 @@ paths:
                   $ref: '#/components/schemas/SearchPreview'
         '204':
           description: no recipes found for this query
+  /recipes/getInstructions/{recipeId}:
+    get:
+      tags:
+        - Recipes
+      summary: Return all analyzed instructions details on recipe by it's ID
+      description: Return all analyzed instructions details on recipe by it's ID
+      parameters:
+        - name: recipeId
+          in: path
+          description: recipe's id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: data about the recipe
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/getInstructions'
+        '404':
+          description: recipeId is not exists
 components:
   schemas:
     User:
@@ -760,3 +849,46 @@ components:
           type: integer
           description: serving amount
           example: 10
+    getInstructions:
+      type: object
+      properties:
+        number:
+          type: integer
+          description: number of step
+          example: 3
+        step:
+          type: string
+        ingredients:
+          type: array
+          items:
+            type: object
+            properties:
+              image:
+                type: string
+                description: the image of the ingredient
+                example: tomato-paste.jpg
+              name:
+                type: string
+                description: name of the ingredient
+                example: tomato paste
+              amount:
+                type: integer
+                description: amount of the ingredient
+                example: 50
+              unit:
+                type: string
+                description: unit used for sacling
+                example: Tbsp
+        equipment:
+          type: array
+          items:
+            type: object
+            properties:
+              image:
+                type: string
+                description: the image of the equipment
+                example: spoon.jpg
+              name:
+                type: string
+                description: name of the equipment
+                example: spoon

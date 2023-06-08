@@ -57,6 +57,19 @@ async function getFamilyRecipesDetailed(user_id, title) {
   return recipe;
 }
 
+async function markAsMeal(user_id, recipe_id) {
+  await DButils.execQuery(`insert into Meal (user_id, recipe_id) values ('${user_id}','${recipe_id}')`);
+}
+
+async function getMeals(user_id) {
+  const recipes_id = await DButils.execQuery(`SELECT recipe_id FROM Meal WHERE user_id = '${user_id}'`);
+  return recipes_id;
+}
+
+async function deleteMeal(user_id, recipe_id) {
+  await DButils.execQuery(`DELETE FROM Meal WHERE user_id = '${user_id}' AND recipe_id = '${recipe_id}'`);
+}
+
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.markAsVisited = markAsVisited;
@@ -66,3 +79,6 @@ exports.getMyRecipes = getMyRecipes;
 exports.getMyRecipesDetailed = getMyRecipesDetailed;
 exports.getFamilyRecipes = getFamilyRecipes;
 exports.getFamilyRecipesDetailed = getFamilyRecipesDetailed;
+exports.getMeals = getMeals;
+exports.markAsMeal = markAsMeal;
+exports.deleteMeal = deleteMeal;

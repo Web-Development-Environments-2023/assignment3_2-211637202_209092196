@@ -177,4 +177,38 @@ router.get('/familyrecipes/allInformations/:title', async (req, res, next) => {
   }
 });
 
+router.post('/meal', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    await user_utils.markAsMeal(user_id, recipe_id);
+    res.status(200).send('The Recipe successfully saved as visited');
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/meal', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes_id = await user_utils.getMeals(user_id);
+    let recipes_id_array = [];
+    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+    res.status(200).send(recipes_id);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/meal', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    await user_utils.deleteMeal(user_id, recipe_id);
+    res.status(200).send('The Recipe successfully deletedfrom meal list');
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
