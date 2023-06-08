@@ -4,23 +4,23 @@ info:
   description: API for recipes project
   version: 1.0.1
 servers:
-# local:
-- url: "http://127.0.0.1:3000"
-# remote:
-# - url: "http://132.72.65.211"
-  description: SwaggerHub API Auto Mocking hey
+  # local:
+  - url: 'http://127.0.0.1:3000'
+    # remote:
+    # - url: "http://132.72.65.211"
+    description: SwaggerHub API Auto Mocking hey
 tags:
-- name: Auth
-  description: All authentication related routes
-- name: Users
-  description: All the user's personal app info
-- name: Recipes
-  description: All reciepes general info
+  - name: Auth
+    description: All authentication related routes
+  - name: Users
+    description: All the user's personal app info
+  - name: Recipes
+    description: All reciepes general info
 paths:
   /register:
     post:
       tags:
-      - Auth
+        - Auth
       summary: A new user from the client is added to the server
       description: A JSON object contains all the details about the new user.
       requestBody:
@@ -31,14 +31,14 @@ paths:
               $ref: '#/components/schemas/User'
         required: true
       responses:
-        "201":
+        '201':
           description: A new user has been added
-        "400":
+        '400':
           description: wrong input parameters
   /login:
     post:
       tags:
-      - Auth
+        - Auth
       summary: Login an exist user
       description: An exist user login to the system
       requestBody:
@@ -48,7 +48,7 @@ paths:
               $ref: '#/components/schemas/LoginScheme'
         required: true
       responses:
-        "200":
+        '200':
           description: |
             User was found in the DB and authenitcated successfully. The session ID is returned in a cookie named `session`.  You should include this cookie in subsequent requests
           headers:
@@ -58,7 +58,7 @@ paths:
               schema:
                 type: string
                 example: session=87s97sdhgf279293f8w0e9
-        "401":
+        '401':
           description: Authentication failed
   /logout:
     post:
@@ -66,16 +66,16 @@ paths:
         - Auth
       summary: logout a user from the system and delete his cookie
       responses:
-        "200":
-          description: "the user has ben successfully logged out"
+        '200':
+          description: 'the user has ben successfully logged out'
   /users/favorites:
     get:
       tags:
-      - Users
+        - Users
       summary: Return the favorite recipes that were saved by user
       description: Get an array of recipes that were saved by a specific user
       responses:
-        "200":
+        '200':
           description: data about the user's favorites recipes returned
           content:
             application/json:
@@ -83,13 +83,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RecipePreview'
-        "401":
+        '401':
           description: user is not authorized
       security:
-      - cookieAuth: []
+        - cookieAuth: []
     post:
       tags:
-      - Users
+        - Users
       summary: save recipe in the favorites list of a user
       description: save recipe in the favorites list of a user
       requestBody:
@@ -98,40 +98,378 @@ paths:
             schema:
               type: object
               properties:
-                reciepeId:
+                recipeId:
                   type: string
-                  description: reciepe's id which the user saved
+                  description: recipe's id which the user saved
                   example: 716429
       responses:
-        "200":
+        '200':
           description: The Recipe successfully saved as favorite
-        "401":
+        '401':
+          description: user is not authorized
+        '500':
+          description: spoonacular could not find a recipe with the id provided
+      security:
+        - cookieAuth: []
+  /users/visited:
+    get:
+      tags:
+        - Users
+      summary: Return the last 3 visited recipes by a specific user
+      description: Get an array of length 3 of recipes that were visited by a specific user
+      responses:
+        '200':
+          description: data about the user's last 3 visited recipes returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        '401':
           description: user is not authorized
       security:
-      - cookieAuth: []
+        - cookieAuth: []
+    post:
+      tags:
+        - Users
+      summary: Add recently Viewed recipe to the user's visited recipes
+      description: save the recipe in the visited recipes list of a specific user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe id for which should be added to the user visited recipes list
+                  example: 716429
+      responses:
+        '200':
+          description: The recipe has been successfully added to the user viewed recipes list
+        '401':
+          description: user is not authorized
+        '500':
+          description: spoonacular could not find a recipe with the id provided
+      security:
+        - cookieAuth: []
+  /users/create:
+    post:
+      tags:
+        - Users
+      summary: create a recipe by a user
+      description: giving all recipe informations needed, the user create a recipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRecipe'
+        required: true
+      responses:
+        '200':
+          description: Recipe created successfully by the user
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/myrecipes:
+    get:
+      tags:
+        - Users
+      summary: return preview details for all recipes the user created
+      description: return an array with all preview details of the user's recipes
+      responses:
+        '200':
+          description: the user's recipes data is successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRecipePreview'
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/myrecipes/allInformations/{title}:
+    get:
+      tags:
+        - Users
+      summary: Return all details of a user created recipe
+      description: Return all details of a user created recipe
+      parameters:
+        - name: title
+          in: path
+          description: recipe title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: recipe details returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRecipe'
+        '204':
+          description: recipe's title is not found in the user own recipes
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/familyrecipes:
+    get:
+      tags:
+        - Users
+      summary: return family recipes preview
+      description: return an array of the family recipes that were saved by the user
+      responses:
+        '200':
+          description: family recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRecipePreview'
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/familyrecipes/allInformations/{title}:
+    get:
+      tags:
+        - Users
+      summary: Return all details of a user family recipe
+      description: Return all details of a user family recipe
+      parameters:
+        - name: title
+          in: path
+          description: recipe title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: recipes details returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamilyRecipesDetailed'
+        '204':
+          description: recipe's title is not found in the user own recipes
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+  /users/meal:
+    get:
+      tags:
+        - Users
+      summary: Return the meals id saved for the user
+      description: Get an array of recipes_id saved in the user's meal
+      responses:
+        '200':
+          description: data about the user's reciped_id returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    recipeId:
+                      type: string
+                      description: recipe's id which the user saved
+                      example: 716429
+        '401':
+          description: user is not authorized
+      security:
+        - cookieAuth: []
+    post:
+      tags:
+        - Users
+      summary: save recipe in the meal list of a user
+      description: save recipe in the meal list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        '200':
+          description: The Recipe successfully saved in meal list
+        '401':
+          description: user is not authorized
+    delete:
+      tags:
+        - Users
+      summary: Remove a recipe from the meal list of a user
+      description: Remove a recipe from the meal list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        '200':
+          description: The recipe was successfully removed from the meal list
+        '401':
+          description: User is not authorized
   /recipes/{recipeId}:
     get:
       tags:
-      - Recipes
+        - Recipes
       summary: Return preview details on recipe by his ID
       description: Return preview details on recipe by his ID
       parameters:
-      - name: recipeId
-        in: path
-        description: recipe's id
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
+        - name: recipeId
+          in: path
+          description: recipe's id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
       responses:
-        "200":
+        '200':
           description: data about the recipe
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipePreview'
-        "404":
+        '404':
+          description: recipeId is not exists
+  /recipes/random:
+    get:
+      tags:
+        - Recipes
+      summary: Return 3 random recipes from the external api
+      description: Return an array of length 3 that has 3 random recipes from the external api
+      responses:
+        '200':
+          description: 3 random recipes are successfully accepted by the external api
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        '500':
+          description: unexpected error
+  /recipes/allInformations/{recipeId}:
+    get:
+      tags:
+        - Recipes
+      summary: Return all preview details on recipe by his ID
+      description: Return all preview details on recipe by his ID
+      parameters:
+        - name: recipeId
+          in: path
+          description: recipe's id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: data about the recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreviewAll'
+        '404':
+          description: recipeId is not exists
+  /recipes/search/{query}/{number}:
+    get:
+      tags:
+        - Recipes
+      summary: search for recipes by using a query
+      description: search for recipes by using a query
+      parameters:
+        - name: query
+          in: path
+          description: query used for searching the recipe
+          required: true
+          schema:
+            type: string
+        - name: number
+          in: path
+          description: number of recipes to return
+          required: true
+          schema:
+            type: integer
+        - name: cuisine
+          in: query
+          description: filtering by cuisine
+          explode: false
+          schema:
+            type: string
+        - name: diet
+          in: query
+          description: filtering by diet
+          explode: false
+          schema:
+            type: string
+        - name: intolerances
+          in: query
+          description: filtering by intolerances
+          explode: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: The strategy to sort recipes by
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data about the recipes is successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchPreview'
+        '204':
+          description: no recipes found for this query
+  /recipes/getInstructions/{recipeId}:
+    get:
+      tags:
+        - Recipes
+      summary: Return all analyzed instructions details on recipe by it's ID
+      description: Return all analyzed instructions details on recipe by it's ID
+      parameters:
+        - name: recipeId
+          in: path
+          description: recipe's id
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: data about the recipe
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/getInstructions'
+        '404':
           description: recipeId is not exists
 components:
   schemas:
@@ -227,4 +565,330 @@ components:
           type: boolean
           description: indication if the recipe is gluten free
           example: false
-  
+    RecipePreviewAll:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: recipe identifier
+          example: 102
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: object
+          description: list of the recipe ingredients
+          example:
+            [
+              {
+                'id': 11124,
+                'aisle': 'Produce',
+                'image': 'sliced-carrot.png',
+                'consistency': 'SOLID',
+                'name': 'carrot',
+                'nameClean': 'carrot',
+                'original': 'Â½ cup diced carrot',
+                'originalName': 'diced carrot',
+                'amount': 0.5,
+                'unit': 'cup',
+                'meta': ['diced'],
+                'measures':
+                  {
+                    'us': { 'amount': 0.5, 'unitShort': 'cups', 'unitLong': 'cups' },
+                    'metric': { 'amount': 118.294, 'unitShort': 'ml', 'unitLong': 'milliliters' },
+                  },
+              },
+            ]
+        analyzedInstructions:
+          type: object
+          description: making instruction
+          example:
+            [
+              {
+                'name': '',
+                'steps':
+                  [
+                    {
+                      'number': 1,
+                      'step': 'Deep fry shallot till golden brown, drain oil and set aside.  Retain the oil for later use.Wash rice and add oil.',
+                      'ingredients':
+                        [
+                          { 'id': 11677, 'name': 'shallot', 'localizedName': 'shallot', 'image': 'shallots.jpg' },
+                          { 'id': 20444, 'name': 'rice', 'localizedName': 'rice', 'image': 'uncooked-white-rice.png' },
+                          {
+                            'id': 4582,
+                            'name': 'cooking oil',
+                            'localizedName': 'cooking oil',
+                            'image': 'vegetable-oil.jpg',
+                          },
+                        ],
+                      'equipment': [],
+                    },
+                  ],
+              },
+            ]
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
+    SearchPreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: recipe identifier
+          example: 102
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        analyzedInstructions:
+          type: object
+          description: making instruction
+          example:
+            [
+              {
+                'name': '',
+                'steps':
+                  [
+                    {
+                      'number': 1,
+                      'step': 'Deep fry shallot till golden brown, drain oil and set aside.  Retain the oil for later use.Wash rice and add oil.',
+                      'ingredients':
+                        [
+                          { 'id': 11677, 'name': 'shallot', 'localizedName': 'shallot', 'image': 'shallots.jpg' },
+                          { 'id': 20444, 'name': 'rice', 'localizedName': 'rice', 'image': 'uncooked-white-rice.png' },
+                          {
+                            'id': 4582,
+                            'name': 'cooking oil',
+                            'localizedName': 'cooking oil',
+                            'image': 'vegetable-oil.jpg',
+                          },
+                        ],
+                      'equipment': [],
+                    },
+                  ],
+              },
+            ]
+    UserRecipe:
+      type: object
+      properties:
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: string
+          description: list of the recipe ingredients
+          example: one tablespoon of backing powder and one cup of milk
+        analyzedInstructions:
+          type: string
+          description: making instruction
+          example: mix the milk with the backing powder
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
+    UserRecipePreview:
+      type: object
+      properties:
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+    FamilyRecipesDetailed:
+      type: object
+      properties:
+        belongTo:
+          type: string
+          description: who made this recipe
+          example: grandmother
+        whenToMake:
+          type: string
+          description: when to make this recipe
+          example: easter
+        title:
+          type: string
+          description: recipe name
+          example: Simple Macaroni and Cheese
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
+        readyInMinutes:
+          type: integer
+          description: the time takes to make this recipe
+          example: 45
+        popularity:
+          type: integer
+          description: how many likes got this recipe
+          example: 5987
+        vegetarian:
+          type: boolean
+          description: indication if the recipe is vegetarian
+          example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
+        glutenFree:
+          type: boolean
+          description: indication if the recipe is gluten free
+          example: false
+        extendedIngredients:
+          type: string
+          description: list of the recipe ingredients
+          example: one tablespoon of backing powder and one cup of milk
+        analyzedInstructions:
+          type: string
+          description: making instruction
+          example: mix the milk with the backing powder
+        servings:
+          type: integer
+          description: serving amount
+          example: 10
+    getInstructions:
+      type: object
+      properties:
+        number:
+          type: integer
+          description: number of step
+          example: 3
+        step:
+          type: string
+        ingredients:
+          type: array
+          items:
+            type: object
+            properties:
+              image:
+                type: string
+                description: the image of the ingredient
+                example: tomato-paste.jpg
+              name:
+                type: string
+                description: name of the ingredient
+                example: tomato paste
+              amount:
+                type: integer
+                description: amount of the ingredient
+                example: 50
+              unit:
+                type: string
+                description: unit used for sacling
+                example: Tbsp
+        equipment:
+          type: array
+          items:
+            type: object
+            properties:
+              image:
+                type: string
+                description: the image of the equipment
+                example: spoon.jpg
+              name:
+                type: string
+                description: name of the equipment
+                example: spoon
