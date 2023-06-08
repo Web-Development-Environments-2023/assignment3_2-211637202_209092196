@@ -4,7 +4,9 @@ const recipes_utils = require('./utils/recipes_utils');
 
 router.get('/', (req, res) => res.send('im here'));
 
-// This path will get random 3 recipes from the external api
+/**
+ * This path will get random 3 recipes from the external api
+ */
 router.get('/random', async (req, res, next) => {
   try {
     const recipes = await recipes_utils.getRandomRecipes();
@@ -14,7 +16,9 @@ router.get('/random', async (req, res, next) => {
   }
 });
 
-// This path will get all informations for a specific recipe (informations as needed in the assignment )
+/**
+ * This path will get all informations for a specific recipe (informations as needed in the assignment )
+ */
 router.get('/allInformations/:recipeId', async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getAllInformations(req.params.recipeId);
@@ -24,13 +28,16 @@ router.get('/allInformations/:recipeId', async (req, res, next) => {
   }
 });
 
+/**
+ * This path will return recipes giving a query and number of recipes to return
+ */
 router.get('/search/:query/:number', async (req, res, next) => {
   try {
     const { query } = req.params;
     let { number } = req.params;
     const { cuisine, diet, intolerances, sort } = req.query;
 
-    ////////////////////////////////
+    // In client check if this two lines should be deleted
     if (number === '{number}') {
       number = 5;
     }
@@ -57,6 +64,9 @@ router.get('/search/:query/:number', async (req, res, next) => {
   }
 });
 
+/**
+ * This path will return instructions for the recipe giving a recipe id (bonus)
+ */
 router.get('/getInstructions/:recipeId', async (req, res, next) => {
   try {
     const instructions = await recipes_utils.getInstructions(req.params.recipeId);

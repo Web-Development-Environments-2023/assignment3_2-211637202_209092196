@@ -83,7 +83,7 @@ router.get('/visited', async (req, res, next) => {
     // getVisitedRecipes will return only the last 3 recipes id that the user has recently visited
     const recipes_id = await user_utils.getVisitedRecipes(user_id);
     let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+    recipes_id.map((element) => recipes_id_array.push(element.recipe_id));
     const results = await recipe_utils.getRecipesPreview(recipes_id_array);
     res.status(200).send(results);
   } catch (error) {
@@ -91,6 +91,9 @@ router.get('/visited', async (req, res, next) => {
   }
 });
 
+/**
+ * This path will create a new recipe made by the user and save it to the database
+ */
 router.post('/create', async (req, res, next) => {
   try {
     const {
@@ -127,6 +130,9 @@ router.post('/create', async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns the recipes made by the user
+ */
 router.get('/myrecipes', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
@@ -137,6 +143,9 @@ router.get('/myrecipes', async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns the recipes made by the user with all the details (including the equipment and instructions..)
+ */
 router.get('/myrecipes/allInformations/:title', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
@@ -152,6 +161,9 @@ router.get('/myrecipes/allInformations/:title', async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns the recipes that the user saved from the beggining as a family recipe
+ */
 router.get('/familyrecipes', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
@@ -162,6 +174,9 @@ router.get('/familyrecipes', async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns the family recipes of a user with all the details (including the equipment and instructions..)
+ */
 router.get('/familyrecipes/allInformations/:title', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
@@ -177,6 +192,9 @@ router.get('/familyrecipes/allInformations/:title', async (req, res, next) => {
   }
 });
 
+/**
+ * This path save a recipe in the meal list of the user
+ */
 router.post('/meal', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
@@ -188,18 +206,24 @@ router.post('/meal', async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns the recipes saved as in the meal list of a user
+ */
 router.get('/meal', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes_id = await user_utils.getMeals(user_id);
     let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+    recipes_id.map((element) => recipes_id_array.push(element.recipe_id));
     res.status(200).send(recipes_id);
   } catch (error) {
     next(error);
   }
 });
 
+/**
+ * This path delete a recipe in the meal list of a user
+ */
 router.delete('/meal', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
